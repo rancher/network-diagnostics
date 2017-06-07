@@ -244,11 +244,13 @@ func (s *Server) ListLogs(w http.ResponseWriter, r *http.Request) {
 
 	apiContext := api.GetApiContext(r)
 	logrus.Debugf("apiContext: %v", apiContext)
+	context := apiContext.UrlBuilder.Current()
 
 	resp := LogCollection{}
 	s.Lock()
 	for _, l := range s.logs {
 		log := *l
+		log.DownloadURL = fmt.Sprintf("%v/%v.zip", context, log.FileName)
 		resp.Data = append(resp.Data, log)
 	}
 	s.Unlock()
@@ -301,6 +303,7 @@ func (s *Server) DeleteLog(w http.ResponseWriter, r *http.Request) {
 func (s *Server) LoadLogDetails(w http.ResponseWriter, r *http.Request) {
 	logrus.Debugf("LoadLogDetails")
 	apiContext := api.GetApiContext(r)
+	context := apiContext.UrlBuilder.Current()
 	var errMsg string
 	var errStatus int
 	ok := true
@@ -332,6 +335,7 @@ func (s *Server) LoadLogDetails(w http.ResponseWriter, r *http.Request) {
 		errStatus = http.StatusNotFound
 		return
 	}
+	resp.DownloadURL = fmt.Sprintf("%v/%v.zip", context, resp.FileName)
 	apiContext.Write(&resp)
 }
 
@@ -351,10 +355,9 @@ func NewLog() *Log {
 			Id:   logFileID,
 			Type: "log",
 		},
-		FileName:    fileName,
-		DownloadURL: fmt.Sprintf("http://%v.zip", fileName),
-		State:       "creating",
-		Self:        logFileID,
+		FileName: fileName,
+		State:    "creating",
+		Self:     logFileID,
 	}
 	logrus.Debugf("NewLog: %v", log)
 	return log
@@ -363,14 +366,12 @@ func NewLog() *Log {
 // GenerateLog ...
 func (s *Server) GenerateLog(w http.ResponseWriter, r *http.Request) {
 	logrus.Debugf("Request to generate log")
+	apiContext := api.GetApiContext(r)
 
 	log := NewLog()
 	s.appendLog(log)
 
 	go s.collectLogs(log)
-
-	apiContext := api.GetApiContext(r)
-	logrus.Infof("apiContext: %v", apiContext)
 
 	apiContext.Write(log)
 }
