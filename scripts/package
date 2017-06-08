@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+source $(dirname $0)/version
+
+ARCH=${ARCH:?"ARCH not set"}
+SUFFIX=""
+[ "${ARCH}" != "amd64" ] && SUFFIX="_${ARCH}"
+
+cd $(dirname $0)/../package
+
+TAG=${TAG:-${IMAGE_VERSION}${SUFFIX}}
+REPO=${REPO:-rancher}
+
+if [ ! -e ../bin/network-support ]; then
+    ../scripts/build
+fi
+
+cp ../bin/network-support .
+
+IMAGE=${REPO}/network-support:${TAG}
+docker build -t ${IMAGE} .
+echo ${IMAGE} > ../dist/images
+echo Built ${IMAGE}
