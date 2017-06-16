@@ -54,12 +54,14 @@ echo "${CONTAINERS}" | grep healthcheck | awk '{system("rancher logs --tail=-1 "
 echo "Collecting scheduler logs"
 echo "${CONTAINERS}" | grep scheduler | awk '{system("rancher logs --tail=-1 "$1" > "$2"-"$5"-"$1".log 2>&1");}'
 
-NS_CONTAINERS=`echo "${CONTAINERS}" | grep network-support-agent`
+NS_AGENT_NAME="${NS_AGENT_NAME:-network-diagnostics-agent}"
+
+NS_CONTAINERS=`echo "${CONTAINERS}" | grep "${NS_AGENT_NAME}"`
 if [ "${NS_CONTAINERS}" != "" ]; then
-    echo "Collecting network-support-agent logs"
-    echo "${NS_CONTAINERS}" | grep network-support-agent | awk '{system("mkdir -p "$5";rancher --host "$5" docker cp "$7":/logs ./"$5"/")}'
+    echo "Collecting ${NS_AGENT_NAME} logs"
+    echo "${NS_CONTAINERS}" | grep ${NS_AGENT_NAME} | awk '{system("mkdir -p "$5";rancher --host "$5" docker cp "$7":/logs ./"$5"/")}'
 else
-    echo "Collecting network-support-agent logs: service not running"
+    echo "Collecting ${NS_AGENT_NAME} logs: service not running"
 fi
 
 cd ..
