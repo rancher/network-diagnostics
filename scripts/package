@@ -12,13 +12,13 @@ cd $(dirname $0)/../package
 TAG=${TAG:-${IMAGE_VERSION}${SUFFIX}}
 REPO=${REPO:-rancher}
 
-if [ ! -e ../bin/network-support ]; then
+if [ ! -e ../bin/network-diagnostics ]; then
     ../scripts/build
 fi
 
-cp ../bin/network-support .
+cp ../bin/network-diagnostics .
 
-IMAGE=${REPO}/network-support:${TAG}
+IMAGE=${REPO}/network-diagnostics:${TAG}
 docker build -t ${IMAGE} .
 echo ${IMAGE} > ../dist/images
 echo Built ${IMAGE}

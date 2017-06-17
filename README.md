@@ -1,4 +1,4 @@
-# network-support
+# network-diagnostics
 ========
 
 This microservice does the following:
@@ -11,7 +11,7 @@ This microservice does the following:
 
 ## Running
 
-`./bin/network-support`
+`./bin/network-diagnostics`
 
 ## License
 Copyright (c) 2014-2017 [Rancher Labs, Inc.](http://rancher.com)
