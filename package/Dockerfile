@@ -7,5 +7,5 @@ RUN curl -sLf https://github.com/rancher/cli/releases/download/${RANCHER_CLI_VER
     && mv /tmp/rancher-${RANCHER_CLI_VERSION}/rancher /usr/bin \
     && rm -rf /tmp/rancher-${RANCHER_CLI_VERSION} \
     && chmod +x /usr/bin/rancher
-COPY start.sh setup-cli.sh network-support logs-collector.sh /usr/bin/
+COPY start.sh setup-cli.sh network-diagnostics logs-collector.sh /usr/bin/
 CMD ["start.sh"]
