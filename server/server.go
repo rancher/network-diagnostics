@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"text/template"
 	"time"
@@ -250,7 +251,7 @@ func (s *Server) ListLogs(w http.ResponseWriter, r *http.Request) {
 	s.Lock()
 	for _, l := range s.logs {
 		log := *l
-		log.DownloadURL = fmt.Sprintf("%v/%v.zip", context, log.FileName)
+		log.DownloadURL = getDownloadURL(context, r.URL.String(), log.FileName)
 		resp.Data = append(resp.Data, log)
 	}
 	s.Unlock()
@@ -335,7 +336,7 @@ func (s *Server) LoadLogDetails(w http.ResponseWriter, r *http.Request) {
 		errStatus = http.StatusNotFound
 		return
 	}
-	resp.DownloadURL = fmt.Sprintf("%v/%v.zip", context, resp.FileName)
+	resp.DownloadURL = getDownloadURL(context, r.URL.String(), resp.FileName)
 	apiContext.Write(&resp)
 }
 
@@ -443,4 +444,9 @@ func errorHandler(w http.ResponseWriter, r *http.Request, status int) {
 	if status == http.StatusNotFound {
 		fmt.Fprint(w, "404")
 	}
+}
+
+func getDownloadURL(context, url, filename string) string {
+	base := strings.Replace(context, url, "", -1)
+	return fmt.Sprintf("%v/static/logs/%v.zip", base, filename)
 }
